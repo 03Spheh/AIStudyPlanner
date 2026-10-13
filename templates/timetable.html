@@ -1,0 +1,1789 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Study Planner - Timetable</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        nav {
+            background: #172554;
+            color: white;
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav h2 {
+            margin: 0;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .hero {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .hero h1 {
+            margin-top: 0;
+            color: #172554;
+        }
+
+        .hero p {
+            line-height: 1.6;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #172554;
+        }
+
+        .availability-row {
+            display: grid;
+            grid-template-columns: 130px 100px 1fr 1fr 150px;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .availability-header {
+            font-weight: bold;
+            color: #475569;
+        }
+
+        .day-name {
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input:disabled {
+            background: #e5e7eb;
+        }
+
+        .module {
+            border: 1px solid #dbe3ef;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            background: #f8fafc;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1.5fr 1.5fr auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 11px 18px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .add-btn {
+            background: #e2e8f0;
+            color: #172554;
+            margin-top: 10px;
+        }
+
+        .remove-btn {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .generate-btn {
+            width: 100%;
+            background: #172554;
+            color: white;
+            font-size: 17px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .generate-btn:hover {
+            background: #1e3a8a;
+        }
+
+        .rule-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .rule {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .rule h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #172554;
+        }
+
+        .rule p {
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .summary-box {
+            background: #eff6ff;
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .summary-box h3 {
+            margin: 0 0 8px;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .summary-box strong {
+            font-size: 25px;
+            color: #172554;
+        }
+
+        .day-card {
+            border: 1px solid #dbe3ef;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            overflow: hidden;
+        }
+
+        .day-title {
+            background: #172554;
+            color: white;
+            padding: 14px 18px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .session {
+            display: grid;
+            grid-template-columns: 150px 1fr 130px;
+            gap: 15px;
+            align-items: center;
+            padding: 15px 18px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .session:last-child {
+            border-bottom: none;
+        }
+
+        .session-time {
+            font-weight: bold;
+            color: #172554;
+        }
+
+        .session-module {
+            font-weight: bold;
+        }
+
+        .session-type {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .break {
+            padding: 9px 18px;
+            background: #f8fafc;
+            color: #64748b;
+            font-style: italic;
+            font-size: 13px;
+        }
+
+        .rest-day {
+            padding: 20px;
+            text-align: center;
+            color: #64748b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #dbe3ef;
+            text-align: left;
+        }
+
+        th {
+            background: #eff6ff;
+            color: #172554;
+        }
+
+        .error {
+            display: none;
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success-note {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 900px) {
+            .availability-row {
+                grid-template-columns: 1fr;
+            }
+
+            .module-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .rule-grid,
+            .summary-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .session {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <h2>AI Study Planner</h2>
+
+    <div>
+        <a href="/home">Home</a>
+        <a href="/timetable">Timetable</a>
+        <a href="/materials">Study Materials</a>
+        <a href="/logout">Logout</a>
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="hero">
+        <h1>Personalized Study Timetable</h1>
+
+        <p>
+            Tell the planner <strong>when you are available to study</strong>.
+            The system will then decide <strong>which modules should be studied</strong>
+            during those periods.
+        </p>
+
+        <div class="success-note">
+            <strong>Important:</strong>
+            You do not choose which module goes into each time slot.
+            The intelligent scheduling algorithm makes that decision using
+            assessment dates, credits, assessment type, study gaps and study spacing.
+        </div>
+    </div>
+
+    <div id="errorBox" class="error"></div>
+
+    <!-- AVAILABILITY -->
+    <div class="card">
+
+        <h2>1. Your Weekly Availability</h2>
+
+        <p>
+            Choose your own available time for each day.
+            You can leave a day unavailable if you are busy.
+            Overnight sessions such as <strong>22:00 → 04:00</strong>
+            are supported automatically.
+        </p>
+
+        <div class="availability-row availability-header">
+            <div>Day</div>
+            <div>Available</div>
+            <div>Start Time</div>
+            <div>End Time</div>
+            <div>Available Hours</div>
+        </div>
+
+        <div id="availabilityContainer"></div>
+
+    </div>
+
+    <!-- STUDY OPTIONS -->
+    <div class="card">
+
+        <h2>2. Study Preferences</h2>
+
+        <div style="max-width: 400px;">
+
+            <label for="breakPreference">
+                Breaks between study sessions
+            </label>
+
+            <select id="breakPreference">
+                <option value="yes">Yes - include 15-minute breaks</option>
+                <option value="no">No - continuous sessions</option>
+            </select>
+
+        </div>
+
+        <p style="margin-top:15px; color:#64748b;">
+            Breaks are optional. When enabled, the planner places a
+            15-minute break between study sessions.
+        </p>
+
+    </div>
+
+    <!-- MODULES -->
+    <div class="card">
+
+        <h2>3. Your Modules</h2>
+
+        <p>
+            Enter your academic information. The planner uses this information
+            to decide which module should receive attention.
+        </p>
+
+        <div id="modulesContainer"></div>
+
+        <button class="add-btn" onclick="addModule()">
+            + Add Module
+        </button>
+
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="card">
+
+        <h2>4. How the Planner Makes Decisions</h2>
+
+        <div class="rule-grid">
+
+            <div class="rule">
+                <h3>📅 Due-Date Urgency</h3>
+                <p>
+                    Assessments that are closer receive a higher scheduling priority.
+                </p>
+            </div>
+
+            <div class="rule">
+                <h3>🎓 Credit Weight</h3>
+                <p>
+                    Modules with more credits can receive greater attention,
+                    but credits are not the only factor.
+                </p>
+            </div>
+
+            <div class="rule">
+                <h3>📝 Assessment Type</h3>
+                <p>
+                    Exams and tests receive different priority weights from
+                    assignments and practical work.
+                </p>
+            </div>
+
+            <div class="rule">
+                <h3>⏳ Study Gap</h3>
+                <p>
+                    If a module has not been studied for several days,
+                    its priority increases.
+                </p>
+            </div>
+
+            <div class="rule">
+                <h3>🔄 Study Spacing</h3>
+                <p>
+                    The planner tries to avoid repeatedly scheduling the
+                    same module when other modules need attention.
+                </p>
+            </div>
+
+            <div class="rule">
+                <h3>📚 Two-Module Rule</h3>
+                <p>
+                    A single day will contain a maximum of two different modules.
+                </p>
+            </div>
+
+            <div class="rule">
+                <h3>⏰ Your Availability</h3>
+                <p>
+                    The timetable is generated inside the times that
+                    you personally provide.
+                </p>
+            </div>
+
+            <div class="rule">
+                <h3>☕ Optional Breaks</h3>
+                <p>
+                    When enabled, 15-minute breaks are placed between
+                    study sessions.
+                </p>
+            </div>
+
+        </div>
+
+        <button class="generate-btn" onclick="generateTimetable()">
+            Generate Personalized Timetable
+        </button>
+
+    </div>
+
+    <!-- RESULTS -->
+    <div id="resultsSection" class="card" style="display:none;">
+
+        <h2>Generated Timetable</h2>
+
+        <div class="summary-grid">
+
+            <div class="summary-box">
+                <h3>Study Sessions</h3>
+                <strong id="sessionCount">0</strong>
+            </div>
+
+            <div class="summary-box">
+                <h3>Study Hours</h3>
+                <strong id="studyHours">0</strong>
+            </div>
+
+            <div class="summary-box">
+                <h3>Modules Covered</h3>
+                <strong id="modulesCovered">0</strong>
+            </div>
+
+            <div class="summary-box">
+                <h3>Most Modules In One Day</h3>
+                <strong id="maxModulesDay">0</strong>
+            </div>
+
+        </div>
+
+        <div id="timetableResults"></div>
+
+        <h2 style="margin-top:35px;">
+            Priority Analysis
+        </h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Module</th>
+                    <th>Credits</th>
+                    <th>Assessment</th>
+                    <th>Days Until Due</th>
+                    <th>Base Priority</th>
+                    <th>Sessions Planned</th>
+                </tr>
+            </thead>
+
+            <tbody id="priorityTable"></tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+const days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+];
+
+let moduleCounter = 0;
+
+
+/* -------------------------------------------------------
+   CREATE AVAILABILITY INPUTS
+------------------------------------------------------- */
+
+function createAvailability() {
+
+    const container = document.getElementById("availabilityContainer");
+
+    container.innerHTML = "";
+
+    days.forEach((day, index) => {
+
+        const row = document.createElement("div");
+
+        row.className = "availability-row";
+
+        row.innerHTML = `
+
+            <div class="day-name">${day}</div>
+
+            <div>
+                <input
+                    type="checkbox"
+                    id="available-${index}"
+                    onchange="toggleAvailability(${index})"
+                >
+            </div>
+
+            <div>
+                <input
+                    type="time"
+                    id="start-${index}"
+                    value="18:00"
+                    disabled
+                    onchange="calculateAvailableHours(${index})"
+                >
+            </div>
+
+            <div>
+                <input
+                    type="time"
+                    id="end-${index}"
+                    value="22:00"
+                    disabled
+                    onchange="calculateAvailableHours(${index})"
+                >
+            </div>
+
+            <div id="hours-${index}">
+                0 hours
+            </div>
+
+        `;
+
+        container.appendChild(row);
+
+    });
+
+}
+
+
+/* -------------------------------------------------------
+   AVAILABILITY
+------------------------------------------------------- */
+
+function toggleAvailability(index) {
+
+    const checkbox =
+        document.getElementById(`available-${index}`);
+
+    const start =
+        document.getElementById(`start-${index}`);
+
+    const end =
+        document.getElementById(`end-${index}`);
+
+    start.disabled = !checkbox.checked;
+    end.disabled = !checkbox.checked;
+
+    calculateAvailableHours(index);
+}
+
+
+function timeToMinutes(time) {
+
+    const parts = time.split(":");
+
+    return parseInt(parts[0]) * 60 +
+           parseInt(parts[1]);
+
+}
+
+
+function calculateAvailableHours(index) {
+
+    const checkbox =
+        document.getElementById(`available-${index}`);
+
+    const hoursElement =
+        document.getElementById(`hours-${index}`);
+
+    if (!checkbox.checked) {
+
+        hoursElement.textContent = "0 hours";
+
+        return 0;
+    }
+
+    const start =
+        document.getElementById(`start-${index}`).value;
+
+    const end =
+        document.getElementById(`end-${index}`).value;
+
+    if (!start || !end) {
+
+        hoursElement.textContent = "Enter times";
+
+        return 0;
+    }
+
+    let startMinutes = timeToMinutes(start);
+    let endMinutes = timeToMinutes(end);
+
+    /*
+       If the end time is earlier than the start time,
+       this means the study session crosses midnight.
+
+       Example:
+
+       22:00 -> 04:00
+
+       22:00 -> 24:00 = 2 hours
+       00:00 -> 04:00 = 4 hours
+
+       Total = 6 hours
+    */
+
+    if (endMinutes <= startMinutes) {
+
+        endMinutes += 24 * 60;
+    }
+
+    const difference = endMinutes - startMinutes;
+
+    const hours = difference / 60;
+
+    hoursElement.textContent =
+        `${hours.toFixed(2)} hours`;
+
+    return hours;
+}
+
+
+/* -------------------------------------------------------
+   MODULES
+------------------------------------------------------- */
+
+function addModule(
+    name = "",
+    credits = "",
+    assessment = "",
+    dueDate = ""
+) {
+
+    moduleCounter++;
+
+    const container =
+        document.getElementById("modulesContainer");
+
+    const moduleDiv =
+        document.createElement("div");
+
+    moduleDiv.className = "module";
+
+    moduleDiv.id = `module-${moduleCounter}`;
+
+    moduleDiv.innerHTML = `
+
+        <div class="module-grid">
+
+            <div>
+                <label>Module Name</label>
+
+                <input
+                    type="text"
+                    class="module-name"
+                    placeholder="e.g. Advanced Calculus"
+                    value="${name}"
+                >
+            </div>
+
+            <div>
+                <label>Credits</label>
+
+                <input
+                    type="number"
+                    class="module-credits"
+                    min="1"
+                    max="60"
+                    placeholder="16"
+                    value="${credits}"
+                >
+            </div>
+
+            <div>
+                <label>Assessment Type</label>
+
+                <select class="assessment-type">
+
+                    <option value="">Select</option>
+                    <option value="Exam"
+                        ${assessment === "Exam" ? "selected" : ""}>
+                        Exam
+                    </option>
+
+                    <option value="Test"
+                        ${assessment === "Test" ? "selected" : ""}>
+                        Test
+                    </option>
+
+                    <option value="Project"
+                        ${assessment === "Project" ? "selected" : ""}>
+                        Project
+                    </option>
+
+                    <option value="Practical"
+                        ${assessment === "Practical" ? "selected" : ""}>
+                        Practical
+                    </option>
+
+                    <option value="Assignment"
+                        ${assessment === "Assignment" ? "selected" : ""}>
+                        Assignment
+                    </option>
+
+                </select>
+            </div>
+
+            <div>
+                <label>Assessment Due Date</label>
+
+                <input
+                    type="date"
+                    class="module-date"
+                    value="${dueDate}"
+                >
+            </div>
+
+            <div>
+                <button
+                    class="remove-btn"
+                    onclick="removeModule(${moduleCounter})"
+                >
+                    Remove
+                </button>
+            </div>
+
+        </div>
+    `;
+
+    container.appendChild(moduleDiv);
+}
+
+
+function removeModule(id) {
+
+    const module =
+        document.getElementById(`module-${id}`);
+
+    if (module) {
+
+        module.remove();
+    }
+}
+
+
+function getModules() {
+
+    const moduleElements =
+        document.querySelectorAll(".module");
+
+    const modules = [];
+
+    moduleElements.forEach(element => {
+
+        const name =
+            element.querySelector(".module-name").value.trim();
+
+        const credits =
+            parseFloat(
+                element.querySelector(".module-credits").value
+            );
+
+        const assessment =
+            element.querySelector(".assessment-type").value;
+
+        const dueDate =
+            element.querySelector(".module-date").value;
+
+        modules.push({
+
+            name,
+            credits,
+            assessment,
+            dueDate,
+
+            sessions: 0,
+            lastStudiedDay: null
+
+        });
+
+    });
+
+    return modules;
+}
+
+
+/* -------------------------------------------------------
+   PRIORITY SYSTEM
+------------------------------------------------------- */
+
+function getAssessmentWeight(type) {
+
+    const weights = {
+
+        "Exam": 5,
+        "Test": 4,
+        "Project": 3,
+        "Practical": 3,
+        "Assignment": 2
+
+    };
+
+    return weights[type] || 0;
+}
+
+
+function getDaysUntilAssessment(dateString) {
+
+    const today = new Date();
+
+    today.setHours(0, 0, 0, 0);
+
+    const dueDate =
+        new Date(dateString + "T00:00:00");
+
+    const difference =
+        dueDate.getTime() - today.getTime();
+
+    return Math.ceil(
+        difference / (1000 * 60 * 60 * 24)
+    );
+}
+
+
+function getDueDateUrgency(daysUntil) {
+
+    if (daysUntil < 0) {
+        return 15;
+    }
+
+    if (daysUntil <= 3) {
+        return 12;
+    }
+
+    if (daysUntil <= 7) {
+        return 10;
+    }
+
+    if (daysUntil <= 14) {
+        return 7;
+    }
+
+    if (daysUntil <= 21) {
+        return 5;
+    }
+
+    if (daysUntil <= 30) {
+        return 3;
+    }
+
+    return 1;
+}
+
+
+function getGapScore(lastStudiedDay, currentDay) {
+
+    if (lastStudiedDay === null) {
+
+        return 6;
+    }
+
+    const gap =
+        currentDay - lastStudiedDay;
+
+    if (gap >= 5) {
+        return 12;
+    }
+
+    if (gap === 4) {
+        return 10;
+    }
+
+    if (gap === 3) {
+        return 7;
+    }
+
+    if (gap === 2) {
+        return 4;
+    }
+
+    if (gap === 1) {
+        return 2;
+    }
+
+    return 0;
+}
+
+
+function calculateBasePriority(module) {
+
+    const creditScore =
+        Math.min(module.credits, 30) / 3;
+
+    const assessmentScore =
+        getAssessmentWeight(module.assessment);
+
+    const daysUntil =
+        getDaysUntilAssessment(module.dueDate);
+
+    const dueScore =
+        getDueDateUrgency(daysUntil);
+
+    return creditScore +
+           assessmentScore +
+           dueScore;
+}
+
+
+function calculateDynamicPriority(
+    module,
+    currentDay,
+    modulesUsedToday
+) {
+
+    let priority =
+        calculateBasePriority(module);
+
+    const gapScore =
+        getGapScore(
+            module.lastStudiedDay,
+            currentDay
+        );
+
+    priority += gapScore;
+
+    /*
+       Encourage modules that have received
+       fewer sessions.
+    */
+
+    priority -= module.sessions * 2;
+
+    /*
+       Avoid immediately repeating a module
+       when another module is available.
+    */
+
+    if (
+        module.lastStudiedDay !== null &&
+        currentDay - module.lastStudiedDay === 0
+    ) {
+
+        priority -= 8;
+    }
+
+    /*
+       If this module is already being used today,
+       slightly reduce its priority so another
+       module gets an opportunity.
+    */
+
+    if (modulesUsedToday.includes(module.name)) {
+
+        priority -= 3;
+    }
+
+    return priority;
+}
+
+
+/* -------------------------------------------------------
+   AVAILABLE TIME CALCULATIONS
+------------------------------------------------------- */
+
+function getAvailability(index) {
+
+    const checkbox =
+        document.getElementById(`available-${index}`);
+
+    if (!checkbox.checked) {
+
+        return null;
+    }
+
+    const start =
+        document.getElementById(`start-${index}`).value;
+
+    const end =
+        document.getElementById(`end-${index}`).value;
+
+    if (!start || !end) {
+
+        return null;
+    }
+
+    let startMinutes =
+        timeToMinutes(start);
+
+    let endMinutes =
+        timeToMinutes(end);
+
+    if (endMinutes <= startMinutes) {
+
+        endMinutes += 1440;
+    }
+
+    return {
+
+        startMinutes,
+        endMinutes,
+
+        totalMinutes:
+            endMinutes - startMinutes
+
+    };
+}
+
+
+function formatTime(minutes) {
+
+    minutes = minutes % 1440;
+
+    let hour =
+        Math.floor(minutes / 60);
+
+    let minute =
+        minutes % 60;
+
+    const suffix =
+        hour >= 12 ? "PM" : "AM";
+
+    let displayHour =
+        hour % 12;
+
+    if (displayHour === 0) {
+        displayHour = 12;
+    }
+
+    return `${displayHour}:${String(minute).padStart(2, "0")} ${suffix}`;
+}
+
+
+/* -------------------------------------------------------
+   CHOOSE MODULE
+------------------------------------------------------- */
+
+function chooseModule(
+    modules,
+    currentDay,
+    modulesUsedToday
+) {
+
+    let candidates =
+        modules.filter(module => {
+
+            /*
+               Maximum two different modules per day.
+
+               If two modules are already being studied,
+               only those two are allowed.
+            */
+
+            if (modulesUsedToday.length >= 2) {
+
+                return modulesUsedToday.includes(
+                    module.name
+                );
+            }
+
+            return true;
+        });
+
+    candidates.sort((a, b) => {
+
+        const priorityA =
+            calculateDynamicPriority(
+                a,
+                currentDay,
+                modulesUsedToday
+            );
+
+        const priorityB =
+            calculateDynamicPriority(
+                b,
+                currentDay,
+                modulesUsedToday
+            );
+
+        return priorityB - priorityA;
+
+    });
+
+    return candidates[0];
+}
+
+
+/* -------------------------------------------------------
+   GENERATE TIMETABLE
+------------------------------------------------------- */
+
+/* -------------------------------------------------------
+   SAVE THE GENERATED TIMETABLE (so the dashboard can use it)
+------------------------------------------------------- */
+
+function saveTimetableToServer(schedule) {
+
+    fetch("/save-timetable", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ schedule: schedule })
+    }).catch(function (error) {
+        console.error("Timetable could not be saved:", error);
+    });
+}
+
+function generateTimetable() {
+
+    hideError();
+
+    const modules =
+        getModules();
+
+    if (modules.length === 0) {
+
+        showError(
+            "Please add at least one module."
+        );
+
+        return;
+    }
+
+
+    /* Validate modules */
+
+    for (const module of modules) {
+
+        if (!module.name) {
+
+            showError(
+                "Please enter a name for every module."
+            );
+
+            return;
+        }
+
+        if (!module.credits ||
+            module.credits <= 0) {
+
+            showError(
+                `Please enter valid credits for ${module.name}.`
+            );
+
+            return;
+        }
+
+        if (!module.assessment) {
+
+            showError(
+                `Please select an assessment type for ${module.name}.`
+            );
+
+            return;
+        }
+
+        if (!module.dueDate) {
+
+            showError(
+                `Please enter an assessment due date for ${module.name}.`
+            );
+
+            return;
+        }
+
+    }
+
+
+    const includeBreaks =
+        document.getElementById("breakPreference").value === "yes";
+
+
+    const schedule = [];
+
+    let totalStudyMinutes = 0;
+
+    let totalSessions = 0;
+
+    const coveredModules =
+        new Set();
+
+
+    /*
+       Process every day independently.
+
+       The student decides whether they are
+       available on that day and the available
+       time range.
+    */
+
+    for (
+        let dayIndex = 0;
+        dayIndex < days.length;
+        dayIndex++
+    ) {
+
+        const availability =
+            getAvailability(dayIndex);
+
+        if (!availability) {
+
+            schedule.push({
+
+                day: days[dayIndex],
+
+                sessions: [],
+
+                available: false
+
+            });
+
+            continue;
+        }
+
+
+        let currentTime =
+            availability.startMinutes;
+
+        const endTime =
+            availability.endMinutes;
+
+        const daySessions = [];
+
+        const modulesUsedToday = [];
+
+
+        /*
+           A normal study session is 60 minutes.
+
+           We only create a session when a full
+           60-minute period is available.
+        */
+
+        while (
+            currentTime + 60 <= endTime
+        ) {
+
+            const selectedModule =
+                chooseModule(
+                    modules,
+                    dayIndex,
+                    modulesUsedToday
+                );
+
+            if (!selectedModule) {
+                break;
+            }
+
+
+            /*
+               Hard maximum:
+               2 different modules per day.
+            */
+
+            if (
+                !modulesUsedToday.includes(
+                    selectedModule.name
+                ) &&
+                modulesUsedToday.length >= 2
+            ) {
+
+                break;
+            }
+
+
+            const sessionStart =
+                currentTime;
+
+            const sessionEnd =
+                currentTime + 60;
+
+
+            daySessions.push({
+
+                module:
+                    selectedModule.name,
+
+                assessment:
+                    selectedModule.assessment,
+
+                start:
+                    sessionStart,
+
+                end:
+                    sessionEnd,
+
+                duration:
+                    60
+
+            });
+
+
+            if (
+                !modulesUsedToday.includes(
+                    selectedModule.name
+                )
+            ) {
+
+                modulesUsedToday.push(
+                    selectedModule.name
+                );
+            }
+
+
+            selectedModule.sessions++;
+
+            selectedModule.lastStudiedDay =
+                dayIndex;
+
+            coveredModules.add(
+                selectedModule.name
+            );
+
+            totalStudyMinutes += 60;
+
+            totalSessions++;
+
+
+            currentTime =
+                sessionEnd;
+
+
+            /*
+               Add optional break.
+
+               Breaks are not counted as study hours.
+            */
+
+            if (
+                includeBreaks &&
+                currentTime + 15 <= endTime
+            ) {
+
+                daySessions.push({
+
+                    break: true,
+
+                    start:
+                        currentTime,
+
+                    end:
+                        currentTime + 15
+
+                });
+
+                currentTime += 15;
+            }
+
+        }
+
+
+        schedule.push({
+
+            day:
+                days[dayIndex],
+
+            sessions:
+                daySessions,
+
+            available:
+                true,
+
+            availableMinutes:
+                availability.totalMinutes
+
+        });
+
+    }
+
+
+    if (totalSessions === 0) {
+
+        showError(
+            "No study sessions could be generated. Please make sure at least one day is marked available and has at least 1 hour of available time."
+        );
+
+        return;
+    }
+
+
+    saveTimetableToServer(schedule);
+
+    displayTimetable(
+        schedule,
+        modules,
+        totalStudyMinutes,
+        totalSessions,
+        coveredModules
+    );
+
+}
+
+
+/* -------------------------------------------------------
+   DISPLAY RESULTS
+------------------------------------------------------- */
+
+function displayTimetable(
+    schedule,
+    modules,
+    totalStudyMinutes,
+    totalSessions,
+    coveredModules
+) {
+
+    const results =
+        document.getElementById(
+            "timetableResults"
+        );
+
+    results.innerHTML = "";
+
+
+    let maximumModulesInOneDay = 0;
+
+
+    schedule.forEach(day => {
+
+        const dayCard =
+            document.createElement("div");
+
+        dayCard.className = "day-card";
+
+
+        const title =
+            document.createElement("div");
+
+        title.className = "day-title";
+
+        title.textContent =
+            day.day;
+
+
+        dayCard.appendChild(title);
+
+
+        if (
+            !day.available ||
+            day.sessions.length === 0
+        ) {
+
+            const rest =
+                document.createElement("div");
+
+            rest.className =
+                "rest-day";
+
+            rest.textContent =
+                "No study time provided for this day.";
+
+            dayCard.appendChild(rest);
+
+            results.appendChild(dayCard);
+
+            return;
+        }
+
+
+        const uniqueModules =
+            new Set(
+                day.sessions
+                    .filter(session => !session.break)
+                    .map(session => session.module)
+            );
+
+
+        maximumModulesInOneDay =
+            Math.max(
+                maximumModulesInOneDay,
+                uniqueModules.size
+            );
+
+
+        day.sessions.forEach(session => {
+
+            if (session.break) {
+
+                const breakDiv =
+                    document.createElement("div");
+
+                breakDiv.className =
+                    "break";
+
+                breakDiv.textContent =
+                    `☕ Break: ${formatTime(session.start)} - ${formatTime(session.end)}`;
+
+                dayCard.appendChild(
+                    breakDiv
+                );
+
+                return;
+            }
+
+
+            const sessionDiv =
+                document.createElement("div");
+
+            sessionDiv.className =
+                "session";
+
+
+            sessionDiv.innerHTML = `
+
+                <div class="session-time">
+                    ${formatTime(session.start)}
+                    -
+                    ${formatTime(session.end)}
+                </div>
+
+                <div>
+                    <div class="session-module">
+                        ${session.module}
+                    </div>
+
+                    <div class="session-type">
+                        ${session.assessment}
+                    </div>
+                </div>
+
+                <div>
+                    60 minutes
+                </div>
+
+            `;
+
+
+            dayCard.appendChild(
+                sessionDiv
+            );
+
+        });
+
+
+        results.appendChild(
+            dayCard
+        );
+
+    });
+
+
+    document.getElementById(
+        "sessionCount"
+    ).textContent =
+        totalSessions;
+
+
+    document.getElementById(
+        "studyHours"
+    ).textContent =
+        (totalStudyMinutes / 60).toFixed(1);
+
+
+    document.getElementById(
+        "modulesCovered"
+    ).textContent =
+        coveredModules.size;
+
+
+    document.getElementById(
+        "maxModulesDay"
+    ).textContent =
+        maximumModulesInOneDay;
+
+
+    displayPriorityTable(
+        modules
+    );
+
+
+    document.getElementById(
+        "resultsSection"
+    ).style.display =
+        "block";
+
+
+    document.getElementById(
+        "resultsSection"
+    ).scrollIntoView({
+        behavior: "smooth"
+    });
+
+}
+
+
+/* -------------------------------------------------------
+   PRIORITY TABLE
+------------------------------------------------------- */
+
+function displayPriorityTable(modules) {
+
+    const table =
+        document.getElementById(
+            "priorityTable"
+        );
+
+    table.innerHTML = "";
+
+
+    modules.forEach(module => {
+
+        const row =
+            document.createElement("tr");
+
+
+        const daysUntil =
+            getDaysUntilAssessment(
+                module.dueDate
+            );
+
+
+        const basePriority =
+            calculateBasePriority(
+                module
+            );
+
+
+        row.innerHTML = `
+
+            <td>${module.name}</td>
+
+            <td>${module.credits}</td>
+
+            <td>${module.assessment}</td>
+
+            <td>${daysUntil}</td>
+
+            <td>${basePriority.toFixed(1)}</td>
+
+            <td>${module.sessions}</td>
+
+        `;
+
+
+        table.appendChild(row);
+
+    });
+
+}
+
+
+/* -------------------------------------------------------
+   ERROR HANDLING
+------------------------------------------------------- */
+
+function showError(message) {
+
+    const errorBox =
+        document.getElementById(
+            "errorBox"
+        );
+
+    errorBox.textContent =
+        message;
+
+    errorBox.style.display =
+        "block";
+
+    errorBox.scrollIntoView({
+        behavior: "smooth"
+    });
+}
+
+
+function hideError() {
+
+    document.getElementById(
+        "errorBox"
+    ).style.display =
+        "none";
+}
+
+
+/* -------------------------------------------------------
+   START PAGE
+------------------------------------------------------- */
+
+createAvailability();
+
+addModule();
+
+</script>
+
+</body>
+</html>
+```
+
+

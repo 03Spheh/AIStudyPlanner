@@ -1,0 +1,700 @@
+
+/* =========================================================
+   AI STUDY PLANNER — COMPLETE ANIMATED THEME
+   ========================================================= */
+
+:root {
+    --ai-bg: #050b18;
+    --ai-panel: rgba(15, 23, 42, 0.92);
+    --ai-panel-light: rgba(15, 30, 55, 0.88);
+    --ai-blue: #38bdf8;
+    --ai-cyan: #22d3ee;
+    --ai-purple: #818cf8;
+    --ai-pink: #c084fc;
+    --ai-text: #f1f5f9;
+    --ai-muted: #94a3b8;
+    --ai-border: rgba(56, 189, 248, 0.25);
+    --ai-radius: 18px;
+}
+
+/* RESET */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: var(--ai-text);
+    background:
+        radial-gradient(
+            ellipse at 10% 10%,
+            rgba(14, 165, 233, 0.18),
+            transparent 38%
+        ),
+        radial-gradient(
+            ellipse at 90% 15%,
+            rgba(129, 140, 248, 0.16),
+            transparent 38%
+        ),
+        radial-gradient(
+            ellipse at 50% 100%,
+            rgba(34, 211, 238, 0.10),
+            transparent 45%
+        ),
+        #050b18;
+    background-size: 200% 200%;
+    animation: aiBackgroundMove 16s ease-in-out infinite alternate;
+    overflow-x: hidden;
+}
+
+/* ANIMATED BACKGROUND */
+
+@keyframes aiBackgroundMove {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    50% {
+        background-position: 100% 40%;
+    }
+
+    100% {
+        background-position: 0% 100%;
+    }
+}
+
+/* FLOATING BACKGROUND LIGHTS */
+
+body::before,
+body::after {
+    content: "";
+    position: fixed;
+    width: 340px;
+    height: 340px;
+    border-radius: 50%;
+    filter: blur(95px);
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: -1;
+}
+
+body::before {
+    top: 5%;
+    left: -130px;
+    background: #0ea5e9;
+    animation: aiOrbOne 12s ease-in-out infinite alternate;
+}
+
+body::after {
+    right: -130px;
+    bottom: 0;
+    background: #8b5cf6;
+    animation: aiOrbTwo 15s ease-in-out infinite alternate;
+}
+
+@keyframes aiOrbOne {
+    from {
+        transform: translate(0, 0) scale(1);
+    }
+
+    to {
+        transform: translate(120px, 100px) scale(1.25);
+    }
+}
+
+@keyframes aiOrbTwo {
+    from {
+        transform: translate(0, 0) scale(1.1);
+    }
+
+    to {
+        transform: translate(-120px, -100px) scale(0.85);
+    }
+}
+
+/* PAGE ENTRANCE */
+
+body > *,
+main,
+.container,
+.login-container,
+.register-container,
+.auth-container,
+.dashboard,
+.page-container {
+    animation: aiPageEnter 0.8s ease both;
+}
+
+@keyframes aiPageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* HEADINGS */
+
+h1,
+h2,
+h3,
+h4 {
+    color: #f8fafc;
+    line-height: 1.3;
+}
+
+h1 {
+    text-shadow: 0 0 18px rgba(56, 189, 248, 0.15);
+}
+
+h1,
+.logo,
+.brand,
+.brand-name {
+    animation: aiTitleGlow 4s ease-in-out infinite alternate;
+}
+
+@keyframes aiTitleGlow {
+    from {
+        text-shadow: 0 0 5px rgba(56, 189, 248, 0.12);
+    }
+
+    to {
+        text-shadow:
+            0 0 12px rgba(56, 189, 248, 0.32),
+            0 0 25px rgba(129, 140, 248, 0.16);
+    }
+}
+
+p,
+label,
+li {
+    line-height: 1.65;
+}
+
+p,
+.subtitle {
+    color: var(--ai-muted);
+}
+
+/* LINKS */
+
+a {
+    color: var(--ai-cyan);
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+        color 0.25s ease,
+        text-shadow 0.25s ease;
+}
+
+a:hover {
+    color: #a5f3fc;
+    text-decoration: underline;
+    text-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
+}
+
+/* CARDS AND PANELS */
+
+.container,
+.login-container,
+.register-container,
+.auth-container,
+.card,
+.panel,
+.module-card,
+.activity-card,
+.material-card,
+section,
+article {
+    background: var(--ai-panel);
+    border: 1px solid var(--ai-border);
+    border-radius: var(--ai-radius);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.20);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition:
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        background 0.3s ease;
+}
+
+.container,
+.login-container,
+.register-container,
+.auth-container {
+    animation: aiCardFloat 5s ease-in-out infinite alternate;
+}
+
+@keyframes aiCardFloat {
+    from {
+        transform: translateY(0);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.20);
+    }
+
+    to {
+        transform: translateY(-6px);
+        box-shadow:
+            0 18px 42px rgba(0, 0, 0, 0.28),
+            0 0 22px rgba(56, 189, 248, 0.10);
+    }
+}
+
+.card:hover,
+.panel:hover,
+.module-card:hover,
+.activity-card:hover,
+.material-card:hover {
+    border-color: rgba(56, 189, 248, 0.55);
+    box-shadow:
+        0 14px 35px rgba(0, 0, 0, 0.25),
+        0 0 20px rgba(56, 189, 248, 0.10);
+}
+
+/* BUTTONS */
+
+button,
+.btn,
+input[type="submit"],
+input[type="button"] {
+    position: relative;
+    overflow: hidden;
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 20px;
+    color: white;
+    background: linear-gradient(110deg, #0ea5e9, #6366f1);
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        filter 0.25s ease;
+}
+
+button:hover,
+.btn:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    transform: translateY(-3px);
+    filter: brightness(1.12);
+    box-shadow:
+        0 8px 25px rgba(56, 189, 248, 0.30),
+        0 0 20px rgba(99, 102, 241, 0.22);
+}
+
+button:active,
+.btn:active,
+input[type="submit"]:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* INPUTS */
+
+input,
+textarea,
+select {
+    max-width: 100%;
+    background: #e8f0ff;
+    color: #101827;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    border-radius: 9px;
+    padding: 12px;
+    font-family: inherit;
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: var(--ai-blue);
+    box-shadow:
+        0 0 0 3px rgba(56, 189, 248, 0.15),
+        0 0 18px rgba(56, 189, 248, 0.12);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    accent-color: #0ea5e9;
+}
+
+/* NAVIGATION */
+
+nav,
+.navbar,
+header {
+    background: rgba(5, 11, 24, 0.88);
+    border-bottom: 1px solid rgba(56, 189, 248, 0.18);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+}
+
+nav a,
+.navbar a,
+header a {
+    display: inline-block;
+    margin: 5px;
+    padding: 8px 10px;
+    border-radius: 8px;
+}
+
+nav a:hover,
+.navbar a:hover,
+header a:hover {
+    background: rgba(56, 189, 248, 0.09);
+}
+
+/* TABLES */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    background: rgba(15, 23, 42, 0.70);
+    border-radius: 12px;
+}
+
+th {
+    background: rgba(14, 165, 233, 0.17);
+    color: #bae6fd;
+    text-align: left;
+}
+
+th,
+td {
+    padding: 12px;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+tr {
+    transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+    background: rgba(56, 189, 248, 0.07);
+}
+
+/* LOGIN AND REGISTRATION */
+
+.login-container,
+.register-container,
+.auth-container,
+.container {
+    width: min(92%, 470px);
+    margin: 30px auto;
+    padding: 30px;
+}
+
+.login-container h1,
+.register-container h1,
+.auth-container h1,
+.container h1 {
+    text-align: center;
+}
+
+.subtitle {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+form label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-weight: 700;
+    color: #e2e8f0;
+}
+
+form input:not([type="checkbox"]):not([type="radio"]),
+form select,
+form textarea {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+form button,
+form input[type="submit"] {
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* ERROR AND SUCCESS MESSAGES */
+
+.error {
+    padding: 12px;
+    margin: 12px 0;
+    color: #fecaca;
+    background: rgba(127, 29, 29, 0.35);
+    border: 1px solid rgba(248, 113, 113, 0.35);
+    border-radius: 9px;
+}
+
+.success {
+    padding: 12px;
+    margin: 12px 0;
+    color: #bbf7d0;
+    background: rgba(20, 83, 45, 0.35);
+    border: 1px solid rgba(74, 222, 128, 0.30);
+    border-radius: 9px;
+}
+
+/* AI PULSE CLASS */
+
+.ai-pulse {
+    animation: aiPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes aiPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 rgba(56, 189, 248, 0);
+    }
+
+    50% {
+        box-shadow:
+            0 0 22px rgba(56, 189, 248, 0.20),
+            0 0 38px rgba(139, 92, 246, 0.10);
+    }
+}
+
+/* HORIZONTAL DIVIDERS */
+
+hr {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(56, 189, 248, 0.5),
+        transparent
+    );
+    margin: 22px 0;
+}
+
+/* SCROLLBAR */
+
+::-webkit-scrollbar {
+    width: 9px;
+}
+
+::-webkit-scrollbar-track {
+    background: #050b18;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(#0ea5e9, #6366f1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(#22d3ee, #a78bfa);
+}
+
+/* RESPONSIVE LAYOUT */
+
+img,
+video,
+iframe {
+    max-width: 100%;
+}
+
+@media (max-width: 600px) {
+    .container,
+    .login-container,
+    .register-container,
+    .auth-container {
+        width: calc(100% - 28px);
+        padding: 22px;
+        margin: 14px auto;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    h1 {
+        font-size: 1.65rem;
+    }
+
+    button,
+    .btn {
+        max-width: 100%;
+    }
+}
+
+/* ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==========================================
+   AI STUDY PLANNER - TIMETABLE OVERFLOW FIX
+   ========================================== */
+
+/* Keep cards and their contents within their boundaries */
+.card,
+.availability-wrapper,
+.weekly-timetable-wrapper {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.card {
+    overflow: hidden;
+}
+
+/* Availability table: contain horizontal overflow */
+.availability-wrapper {
+    display: block;
+    width: 100%;
+    overflow-x: auto !important;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #00cfe8 #e9eef5;
+    border-radius: 10px;
+}
+
+/* Keep the availability columns aligned */
+.availability-table {
+    width: 100%;
+    min-width: 760px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin: 0;
+}
+
+/* Give every column a predictable width */
+.availability-table th:nth-child(1),
+.availability-table td:nth-child(1) {
+    width: 25%;
+}
+
+.availability-table th:nth-child(2),
+.availability-table td:nth-child(2) {
+    width: 13%;
+    text-align: center;
+}
+
+.availability-table th:nth-child(3),
+.availability-table td:nth-child(3) {
+    width: 19%;
+}
+
+.availability-table th:nth-child(4),
+.availability-table td:nth-child(4) {
+    width: 19%;
+}
+
+.availability-table th:nth-child(5),
+.availability-table td:nth-child(5) {
+    width: 24%;
+}
+
+/* Prevent headings and values from colliding */
+.availability-table th,
+.availability-table td {
+    box-sizing: border-box;
+    padding: 12px 10px;
+    vertical-align: middle;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.availability-table th {
+    line-height: 1.35;
+    text-align: left;
+}
+
+.availability-table td {
+    line-height: 1.5;
+}
+
+/* Keep time inputs inside their own columns */
+.availability-table .time-input,
+.availability-table input[type="time"] {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+/* Keep availability checkboxes centred */
+.availability-table .available-checkbox,
+.availability-table input[type="checkbox"] {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Prevent the available-hours text from spilling */
+.availability-table .available-hours {
+    display: block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+/* Contain the generated weekly timetable too */
+.weekly-timetable-wrapper {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.weekly-timetable {
+    min-width: 950px;
+    max-width: none;
+    border-collapse: collapse;
+}
+
+/* Smaller screens */
+@media (max-width: 768px) {
+    .card {
+        padding: 16px;
+    }
+
+    .availability-wrapper,
+    .weekly-timetable-wrapper {
+        width: 100%;
+    }
+
+    .availability-table {
+        min-width: 760px;
+    }
+
+    .availability-table th,
+    .availability-table td {
+        padding: 10px 8px;
+        font-size: 13px;
+    }
+}

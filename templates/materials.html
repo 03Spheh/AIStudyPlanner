@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Study Materials | AI Study Planner</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4efe6;
+            color: #2f2a24;
+            line-height: 1.6;
+        }
+
+        /* NAVBAR */
+
+        .navbar {
+            background: #33251f;
+            color: white;
+            padding: 18px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* HERO */
+
+        .hero {
+            background: #e8dccb;
+            padding: 55px 25px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .hero p {
+            max-width: 720px;
+            margin: auto;
+            font-size: 17px;
+            color: #5e5148;
+        }
+
+        /* MAIN CONTAINER */
+
+        .container {
+            max-width: 1100px;
+            margin: 35px auto;
+            padding: 0 25px;
+        }
+
+        /* CARDS */
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 28px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+        }
+
+        .card h2 {
+            margin-bottom: 8px;
+        }
+
+        .description {
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        /* MODULE */
+
+        .module-input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ccc;
+            border-radius: 9px;
+            font-size: 16px;
+            margin-top: 8px;
+            margin-bottom: 25px;
+        }
+
+        /* UPLOAD GRID */
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .upload-box {
+            border: 2px dashed #b8a38c;
+            border-radius: 13px;
+            padding: 25px;
+            text-align: center;
+            background: #faf7f2;
+            transition: 0.2s;
+        }
+
+        .upload-box:hover {
+            border-color: #33251f;
+            transform: translateY(-2px);
+        }
+
+        .upload-box h3 {
+            margin-bottom: 8px;
+        }
+
+        .upload-box p {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            font-size: 13px;
+        }
+
+        /* BUTTON */
+
+        .button {
+            display: block;
+            margin: 30px auto 0;
+            padding: 14px 32px;
+            background: #33251f;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .button:hover {
+            background: #574239;
+        }
+
+        /* SUCCESS */
+
+        .success {
+            background: #e1f2e5;
+            border-left: 5px solid #39824c;
+            padding: 16px;
+            margin-bottom: 25px;
+            border-radius: 7px;
+        }
+
+        /* UPLOADED FILES */
+
+        .file-list {
+            list-style: none;
+        }
+
+        .file-list li {
+            background: #faf7f2;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #33251f;
+        }
+
+        /* EXTRACTED CONTENT */
+
+        .document-header {
+            background: #f4efe6;
+            padding: 18px;
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-bottom: 12px;
+        }
+
+        .document-header h3 {
+            margin-bottom: 4px;
+        }
+
+        .document-label {
+            color: #777;
+            font-size: 14px;
+        }
+
+        .text-box {
+            background: #fbfbfb;
+            border: 1px solid #e4e4e4;
+            padding: 22px;
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        /* AI SECTION */
+
+        .ai-section {
+            background: #f8f4ee;
+            border: 1px solid #e1d5c7;
+        }
+
+        .ai-intro {
+            margin-bottom: 25px;
+            color: #666;
+        }
+
+        .ai-tools {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .ai-tool {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .ai-tool:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .ai-tool .icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .ai-tool h3 {
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .ai-tool p {
+            font-size: 13px;
+            color: #777;
+        }
+
+        /* COMING SOON */
+
+        .coming-soon {
+            margin-top: 25px;
+            padding: 18px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #33251f;
+        }
+
+        .coming-soon strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* PIPELINE */
+
+        .pipeline {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pipeline-step {
+            background: #f4efe6;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .arrow {
+            font-size: 20px;
+            color: #777;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 850px) {
+
+            .upload-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-tools {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .navbar {
+                padding: 18px 20px;
+            }
+
+            .nav-links {
+                gap: 10px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .ai-tools {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- NAVIGATION -->
+
+<div class="navbar">
+
+    <div class="logo">
+        📚 AI Study Planner
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/home">Home</a>
+
+        <a href="/materials">Study Materials</a>
+
+        <a href="/logout">Logout</a>
+
+    </div>
+
+</div>
+
+
+<!-- HERO -->
+
+<section class="hero">
+
+    <h1>🧠 AI Study Assistant</h1>
+
+    <p>
+        Upload your university study materials and prepare them
+        for intelligent learning assistance.
+    </p>
+
+</section>
+
+
+<div class="container">
+
+
+    <!-- SUCCESS MESSAGE -->
+
+    {% if message %}
+
+    <div class="success">
+
+        ✅ {{ message }}
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- UPLOAD CARD -->
+
+    <div class="card">
+
+        <h2>📖 Prepare Your Study Materials</h2>
+
+        <p class="description">
+
+            Upload your module scope, lecture notes and past examination
+            papers. The system extracts the information so it can later
+            be analysed by the AI study assistant.
+
+        </p>
+
+
+        <form action="/upload" method="POST" enctype="multipart/form-data">
+
+
+            <label>
+
+                <strong>Module Name</strong>
+
+            </label>
+
+
+            <input
+                class="module-input"
+                type="text"
+                name="module_name"
+                placeholder="Example: Mathematical Analysis"
+                required
+            >
+
+
+            <div class="upload-grid">
+
+
+                <!-- SCOPE -->
+
+                <div class="upload-box">
+
+                    <h3>📑 Module Scope</h3>
+
+                    <p>
+                        Upload the official scope showing
+                        the topics you need to study.
+                    </p>
+
+                    <input
+                        type="file"
+                        name="scope_file"
+                        accept=".pdf"
+                    >
+
+                </div>
+
+
+                <!-- NOTES -->
+
+                <div class="upload-box">
+
+                    <h3>📚 Lecture Notes</h3>
+
+                    <p>
+                        Upload your lecture notes or
+                        learning material.
+                    </p>
+
+                    <input
+                        type="file"
+                        name="notes_file"
+                        accept=".pdf"
+                    >
+
+                </div>
+
+
+                <!-- PAST PAPER -->
+
+                <div class="upload-box">
+
+                    <h3>📝 Past Paper</h3>
+
+                    <p>
+                        Upload a previous test or
+                        examination paper.
+                    </p>
+
+                    <input
+                        type="file"
+                        name="past_paper_file"
+                        accept=".pdf"
+                    >
+
+                </div>
+
+
+            </div>
+
+
+            <button class="button" type="submit">
+
+                📤 Upload & Process Materials
+
+            </button>
+
+
+        </form>
+
+    </div>
+
+
+    {% if error %}
+    <div class="card" style="border-left:4px solid #e5484d;">
+        <p class="description" style="color:#e5484d;">{{ error }}</p>
+    </div>
+    {% endif %}
+
+    <!-- UPLOADED MATERIALS -->
+
+    {% if uploaded_files %}
+
+    <div class="card">
+
+        <h2>✅ Processed Materials</h2>
+
+        <p class="description">
+
+            The following documents have been uploaded successfully.
+
+        </p>
+
+
+        <ul class="file-list">
+
+            {% for file in uploaded_files %}
+
+            <li>
+
+                📄 {{ file }}
+
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- EXTRACTED INFORMATION -->
+
+    {% if extracted_texts %}
+
+    <div class="card">
+
+        <h2>🔎 Extracted Study Content</h2>
+
+        <p class="description">
+
+            The system has successfully extracted readable text
+            from your uploaded document. This content becomes the
+            input for the next AI processing stage.
+
+        </p>
+
+
+        {% for name, text in extracted_texts.items() %}
+
+
+        <div class="document-header">
+
+            <h3>📄 {{ name }}</h3>
+
+            <div class="document-label">
+
+                Successfully extracted from uploaded PDF
+
+            </div>
+
+        </div>
+
+
+        <div class="text-box">
+
+            {{ text }}
+
+        </div>
+
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+
+    {% if analysis %}
+    {% for item in analysis %}
+    <div class="card">
+        <h2>🧠 Study Analysis: {{ item.name }}</h2>
+        <h3>Summary</h3>
+        <div class="text-box">{{ item.summary }}</div>
+        <h3>Key topics</h3>
+        <ul class="file-list">
+            {% for topic in item.key_topics %}<li>{{ topic }}</li>{% endfor %}
+        </ul>
+        <h3>Practice questions</h3>
+        <ul class="file-list">
+            {% for q in item.questions %}<li>{{ q }}</li>{% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    <!-- AI TOOLS -->
+
+    <div class="card ai-section">
+
+        <h2>🤖 AI Study Tools</h2>
+
+        <p class="ai-intro">
+
+            Once your study materials have been processed, the AI
+            component can analyse the extracted content and create
+            personalised study resources.
+
+        </p>
+
+
+        <div class="ai-tools">
+
+
+            <div class="ai-tool">
+
+                <div class="icon">📖</div>
+
+                <h3>Generate Summary</h3>
+
+                <p>
+                    Create a concise summary of your study material.
+                </p>
+
+            </div>
+
+
+            <div class="ai-tool">
+
+                <div class="icon">🔑</div>
+
+                <h3>Key Topics</h3>
+
+                <p>
+                    Identify important concepts and topics.
+                </p>
+
+            </div>
+
+
+            <div class="ai-tool">
+
+                <div class="icon">❓</div>
+
+                <h3>Practice Questions</h3>
+
+                <p>
+                    Generate questions from the uploaded material.
+                </p>
+
+            </div>
+
+
+            <div class="ai-tool">
+
+                <div class="icon">📝</div>
+
+                <h3>Generate Quiz</h3>
+
+                <p>
+                    Create a short quiz for revision.
+                </p>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="coming-soon">
+
+            <strong>🚧 AI Processing Stage</strong>
+
+            The document extraction component is currently working.
+            The next development stage will connect these tools to
+            the study analysis engine.
+
+        </div>
+
+
+    </div>
+
+
+    <!-- SYSTEM PIPELINE -->
+
+    <div class="card">
+
+        <h2>⚙️ How the System Works</h2>
+
+        <p class="description">
+
+            The study planner follows a processing pipeline that
+            transforms learning material into personalised study
+            resources.
+
+        </p>
+
+
+        <div class="pipeline">
+
+            <div class="pipeline-step">
+                👨‍🎓 Student
+            </div>
+
+            <div class="arrow">→</div>
+
+            <div class="pipeline-step">
+                📚 Module
+            </div>
+
+            <div class="arrow">→</div>
+
+            <div class="pipeline-step">
+                📑 Scope
+            </div>
+
+            <div class="arrow">→</div>
+
+            <div class="pipeline-step">
+                📖 Notes
+            </div>
+
+            <div class="arrow">→</div>
+
+            <div class="pipeline-step">
+                📄 Past Paper
+            </div>
+
+            <div class="arrow">→</div>
+
+            <div class="pipeline-step">
+                🔎 PDF Extraction
+            </div>
+
+            <div class="arrow">→</div>
+
+            <div class="pipeline-step">
+                🧠 AI Analysis
+            </div>
+
+            <div class="arrow">→</div>
+
+            <div class="pipeline-step">
+                📝 Study Resources
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+<!-- FOOTER -->
+
+<div class="footer">
+
+    AI-Based Personalized Study Planner for University Students
+
+</div>
+
+
+</body>
+
+</html>
+

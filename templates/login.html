@@ -1,0 +1,1029 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#030817">
+
+    <title>Login | AI Study Planner</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='theme.css') }}">
+
+    <style>
+        :root {
+            --cyan: #22dfff;
+            --blue: #2878ff;
+            --purple: #a855f7;
+            --green: #42f5bd;
+            --text: #eef7ff;
+            --muted: #92abc9;
+            --panel: rgba(7, 19, 42, .94);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            padding: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: var(--text);
+            background:
+                radial-gradient(ellipse at 10% 20%,
+                    rgba(0, 153, 255, .20), transparent 38%),
+                radial-gradient(ellipse at 90% 20%,
+                    rgba(138, 43, 226, .20), transparent 38%),
+                radial-gradient(ellipse at 50% 100%,
+                    rgba(0, 221, 255, .09), transparent 45%),
+                #030817;
+            background-size: 180% 180%;
+            animation: backgroundFlow 16s ease-in-out infinite alternate;
+        }
+
+        @keyframes backgroundFlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        /* Moving circuit-board background */
+
+        .circuit-background {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: .24;
+            background-image:
+                linear-gradient(rgba(0, 190, 255, .13) 1px,
+                    transparent 1px),
+                linear-gradient(90deg, rgba(0, 190, 255, .13) 1px,
+                    transparent 1px);
+            background-size: 45px 45px;
+            animation: circuitMove 22s linear infinite;
+            mask-image: linear-gradient(to bottom, black, transparent);
+        }
+
+        @keyframes circuitMove {
+            from { background-position: 0 0; }
+            to { background-position: 90px 90px; }
+        }
+
+        .light-orb {
+            position: fixed;
+            z-index: 0;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: .23;
+            pointer-events: none;
+        }
+
+        .orb-blue {
+            top: 4%;
+            left: -120px;
+            background: #008cff;
+            animation: orbFloat 10s ease-in-out infinite alternate;
+        }
+
+        .orb-purple {
+            right: -120px;
+            bottom: 3%;
+            background: #803cff;
+            animation: orbFloat 13s ease-in-out infinite alternate-reverse;
+        }
+
+        @keyframes orbFloat {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(100px, 65px) scale(1.15); }
+        }
+
+        /* Main layout */
+
+        .page-layout {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1250px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 430px;
+            align-items: center;
+            gap: 55px;
+            animation: pageEntrance .9s ease both;
+        }
+
+        @keyframes pageEntrance {
+            from { opacity: 0; transform: translateY(18px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Branding */
+
+        .intro-panel {
+            min-width: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .brand-icon {
+            width: 62px;
+            height: 62px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            border: 1px solid rgba(34, 223, 255, .65);
+            border-radius: 17px;
+            background: rgba(0, 170, 255, .10);
+            box-shadow: 0 0 25px rgba(0, 195, 255, .18);
+            color: var(--cyan);
+            font-size: 32px;
+            animation: iconGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes iconGlow {
+            to {
+                box-shadow: 0 0 35px rgba(0, 195, 255, .45);
+            }
+        }
+
+        .brand h1 {
+            margin: 0;
+            color: #f4faff;
+            font-size: clamp(25px, 3vw, 36px);
+            letter-spacing: -1px;
+        }
+
+        .brand h1 span {
+            color: var(--cyan);
+        }
+
+        .brand p {
+            margin: 7px 0 0;
+            color: var(--muted);
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .intro-panel > h2 {
+            margin: 0 0 17px;
+            font-size: clamp(34px, 4vw, 51px);
+            line-height: 1.13;
+            letter-spacing: -1.5px;
+        }
+
+        .intro-panel > h2 span {
+            color: var(--cyan);
+            text-shadow: 0 0 25px rgba(34, 223, 255, .22);
+        }
+
+        .intro-description {
+            max-width: 530px;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        /* Project features */
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            max-width: 580px;
+            margin-top: 23px;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            min-height: 73px;
+            padding: 13px;
+            border: 1px solid rgba(67, 163, 255, .23);
+            border-radius: 12px;
+            background: rgba(7, 25, 51, .72);
+            transition: transform .3s ease, border-color .3s ease,
+                        box-shadow .3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-4px);
+            border-color: var(--cyan);
+            box-shadow: 0 8px 25px rgba(0, 195, 255, .12);
+        }
+
+        .feature-icon {
+            flex-shrink: 0;
+            font-size: 25px;
+            color: var(--cyan);
+            filter: drop-shadow(0 0 7px rgba(34, 223, 255, .35));
+        }
+
+        .feature strong {
+            display: block;
+            font-size: 12px;
+            color: #edf8ff;
+        }
+
+        .feature small {
+            display: block;
+            margin-top: 5px;
+            color: #91aacb;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        /* Animated computer window */
+
+        .ai-computer {
+            position: relative;
+            margin-top: 25px;
+            padding: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(34, 223, 255, .45);
+            border-radius: 15px;
+            background: linear-gradient(140deg, #091a35, #030817);
+            box-shadow:
+                0 0 35px rgba(0, 150, 255, .13),
+                inset 0 0 25px rgba(0, 150, 255, .035);
+            animation: computerFloat 5s ease-in-out infinite;
+        }
+
+        .ai-computer::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: -70%;
+            width: 45%;
+            pointer-events: none;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(34, 223, 255, .07),
+                transparent
+            );
+            animation: screenScan 6s linear infinite;
+        }
+
+        @keyframes computerFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        @keyframes screenScan {
+            to { left: 130%; }
+        }
+
+        .computer-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 4px 3px 12px;
+            border-bottom: 1px solid rgba(75, 160, 255, .20);
+            color: #bceeff;
+            font-size: 9px;
+            letter-spacing: .5px;
+        }
+
+        .computer-lights {
+            display: flex;
+            gap: 5px;
+            flex-shrink: 0;
+        }
+
+        .computer-lights i {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--cyan);
+            box-shadow: 0 0 7px var(--cyan);
+        }
+
+        .computer-live {
+            color: var(--green);
+            white-space: nowrap;
+        }
+
+        .computer-screen {
+            display: grid;
+            grid-template-columns: 88px minmax(0, 1fr);
+            gap: 10px;
+            padding: 12px 0 2px;
+        }
+
+        .computer-sidebar {
+            padding: 7px 5px;
+            border-radius: 8px;
+            background: rgba(0, 150, 255, .06);
+        }
+
+        .computer-sidebar span {
+            display: block;
+            padding: 9px 4px;
+            margin-bottom: 3px;
+            border-radius: 5px;
+            color: #91aed1;
+            font-size: 9px;
+            white-space: nowrap;
+        }
+
+        .computer-sidebar span:first-child {
+            color: var(--cyan);
+            background: rgba(0, 195, 255, .10);
+        }
+
+        .computer-workspace {
+            min-width: 0;
+        }
+
+        .computer-workspace h3 {
+            margin: 1px 0 4px;
+            color: #edf8ff;
+            font-size: 13px;
+        }
+
+        .computer-caption {
+            margin: 0 0 12px;
+            color: #8ba7cb;
+            font-size: 9px;
+            line-height: 1.5;
+        }
+
+        /* Timetable rows */
+
+        .schedule-preview {
+            display: grid;
+            gap: 7px;
+        }
+
+        .schedule-row {
+            display: grid;
+            grid-template-columns: 39px minmax(0, 1fr);
+            align-items: center;
+            gap: 6px;
+            color: #92aed0;
+            font-size: 9px;
+        }
+
+        .schedule-block {
+            position: relative;
+            overflow: hidden;
+            padding: 8px 7px;
+            border: 1px solid rgba(34, 223, 255, .26);
+            border-radius: 5px;
+            background: rgba(0, 160, 255, .10);
+            color: #dff7ff;
+            font-size: 9px;
+            line-height: 1.4;
+            opacity: 0;
+            animation: scheduleBuild .7s ease forwards;
+        }
+
+        .schedule-row:nth-child(1) .schedule-block {
+            animation-delay: .3s;
+        }
+
+        .schedule-row:nth-child(2) .schedule-block {
+            animation-delay: .8s;
+        }
+
+        .schedule-row:nth-child(3) .schedule-block {
+            animation-delay: 1.3s;
+        }
+
+        .schedule-row:nth-child(4) .schedule-block {
+            animation-delay: 1.8s;
+        }
+
+        @keyframes scheduleBuild {
+            from {
+                opacity: 0;
+                transform: translateX(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .schedule-block.maths {
+            border-color: rgba(34, 223, 255, .4);
+        }
+
+        .schedule-block.ai {
+            border-color: rgba(168, 85, 247, .5);
+            background: rgba(128, 65, 255, .13);
+        }
+
+        .schedule-block.cs {
+            border-color: rgba(66, 245, 189, .4);
+            background: rgba(20, 190, 130, .08);
+        }
+
+        .computer-footer {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(75, 160, 255, .2);
+            color: #8caed2;
+            font-size: 9px;
+        }
+
+        .computer-footer strong {
+            color: var(--green);
+        }
+
+        .ai-progress {
+            height: 4px;
+            margin-top: 8px;
+            overflow: hidden;
+            border-radius: 8px;
+            background: rgba(130, 170, 220, .15);
+        }
+
+        .ai-progress span {
+            display: block;
+            width: 0;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--cyan), var(--purple));
+            box-shadow: 0 0 9px rgba(34, 223, 255, .5);
+            animation: progressBuild 3.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes progressBuild {
+            from { width: 8%; }
+            to { width: 94%; }
+        }
+
+        /* System status */
+
+        .system-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            margin-top: 17px;
+            padding: 10px 13px;
+            border: 1px solid rgba(34, 223, 255, .20);
+            border-radius: 30px;
+            background: rgba(0, 170, 255, .06);
+            color: #a1c6e8;
+            font-size: 10px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
+            animation: statusPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+            50% { opacity: .35; }
+        }
+
+        /* Login card */
+
+        .login-container {
+            position: relative;
+            width: 100%;
+            min-width: 0;
+            padding: 35px 30px;
+            overflow: hidden;
+            border: 1px solid rgba(34, 190, 255, .45);
+            border-radius: 22px;
+            background: var(--panel);
+            box-shadow:
+                0 0 45px rgba(0, 130, 255, .12),
+                inset 0 0 30px rgba(0, 130, 255, .035);
+            animation: cardEntrance .9s ease both, cardFloat 5s 1s ease-in-out infinite;
+        }
+
+        .login-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 65%;
+            height: 2px;
+            background: linear-gradient(
+                90deg, transparent, var(--cyan), var(--purple)
+            );
+            animation: borderScan 5s linear infinite;
+        }
+
+        @keyframes cardEntrance {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { box-shadow: 0 0 28px rgba(0, 130, 255, .10); }
+            50% { box-shadow: 0 0 42px rgba(0, 160, 255, .18); }
+        }
+
+        .card-heading {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .brain-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 65px;
+            height: 65px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(34, 223, 255, .35);
+            border-radius: 19px;
+            background: rgba(0, 150, 255, .08);
+            font-size: 33px;
+            animation: brainGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes brainGlow {
+            to {
+                border-color: rgba(34, 223, 255, .8);
+                box-shadow: 0 0 28px rgba(0, 195, 255, .2);
+            }
+        }
+
+        .card-heading h2 {
+            margin: 0;
+            color: #f1f8ff;
+            font-size: 26px;
+        }
+
+        .card-heading h2 span {
+            color: var(--cyan);
+        }
+
+        .card-heading p {
+            margin: 11px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .error {
+            padding: 12px;
+            margin-bottom: 17px;
+            border: 1px solid rgba(248, 113, 113, .4);
+            border-radius: 9px;
+            background: rgba(239, 68, 68, .10);
+            color: #fecaca;
+            font-size: 13px;
+        }
+
+        label {
+            display: block;
+            margin: 17px 0 8px;
+            color: #dcecff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            top: 50%;
+            left: 14px;
+            transform: translateY(-50%);
+            pointer-events: none;
+            font-size: 15px;
+        }
+
+        .input-wrap input {
+            display: block;
+            width: 100%;
+            min-height: 49px;
+            padding: 13px 12px 13px 42px;
+            border: 1px solid rgba(72, 134, 220, .45);
+            border-radius: 10px;
+            outline: none;
+            background: #09162c;
+            color: #f1f8ff;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color .25s ease, box-shadow .25s ease;
+        }
+
+        .input-wrap input::placeholder {
+            color: #7189aa;
+        }
+
+        .input-wrap input:focus {
+            border-color: var(--cyan);
+            box-shadow:
+                0 0 0 3px rgba(0, 195, 255, .09),
+                0 0 18px rgba(0, 195, 255, .10);
+        }
+
+        .login-button {
+            width: 100%;
+            min-height: 50px;
+            margin-top: 25px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(105deg, #05bfe9, #286bff 58%, #9146f5);
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .login-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(33, 159, 255, .28);
+        }
+
+        .login-button:active {
+            transform: scale(.99);
+        }
+
+        .register {
+            margin-top: 23px;
+            color: #91a9c9;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.9;
+        }
+
+        .register a {
+            color: var(--cyan);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .register a:hover {
+            color: #baf7ff;
+            text-decoration: underline;
+        }
+
+        .security-note {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(115, 164, 220, .13);
+            color: #7089aa;
+            font-size: 9px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* Responsive screens */
+
+        @media (max-width: 950px) {
+            body {
+                padding: 24px;
+            }
+
+            .page-layout {
+                max-width: 540px;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 28px;
+            }
+
+            .intro-panel > h2 {
+                font-size: 36px;
+            }
+
+            .brand {
+                margin-bottom: 24px;
+            }
+
+            .login-container {
+                animation: pageEntrance .9s ease both;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 14px;
+            }
+
+            .page-layout {
+                gap: 22px;
+            }
+
+            .brand-icon {
+                width: 51px;
+                height: 51px;
+                font-size: 27px;
+            }
+
+            .brand h1 {
+                font-size: 24px;
+            }
+
+            .intro-panel > h2 {
+                font-size: 30px;
+            }
+
+            .feature-list {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .login-container {
+                padding: 27px 20px;
+            }
+
+            .computer-screen {
+                grid-template-columns: 70px minmax(0, 1fr);
+                gap: 6px;
+            }
+
+            .computer-sidebar span {
+                padding: 8px 2px;
+                font-size: 8px;
+            }
+
+            .schedule-row {
+                grid-template-columns: 36px minmax(0, 1fr);
+                gap: 5px;
+            }
+
+            .schedule-block {
+                font-size: 8px;
+                padding: 7px 5px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="circuit-background" aria-hidden="true"></div>
+    <div class="light-orb orb-blue" aria-hidden="true"></div>
+    <div class="light-orb orb-purple" aria-hidden="true"></div>
+
+    <main class="page-layout">
+
+        <!-- LEFT: PROJECT INTRODUCTION -->
+
+        <section class="intro-panel">
+
+            <div class="brand">
+                <div class="brand-icon" aria-hidden="true">⌘</div>
+
+                <div>
+                    <h1><span>AI</span> Study Planner</h1>
+                    <p>Plan &bull; Study &bull; Achieve</p>
+                </div>
+            </div>
+
+            <h2>
+                Your goals.<br>
+                Your schedule.<br>
+                <span>Powered by intelligence.</span>
+            </h2>
+
+            <p class="intro-description">
+                A smarter way to organize your university life.
+                Manage study time, organize learning materials, and
+                prioritize important assessments with your AI Study Planner.
+            </p>
+
+            <div class="feature-list">
+
+                <div class="feature">
+                    <span class="feature-icon" aria-hidden="true">⌘</span>
+                    <div>
+                        <strong>Smart Timetable</strong>
+                        <small>Organize your available study hours</small>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <span class="feature-icon" aria-hidden="true">▤</span>
+                    <div>
+                        <strong>Study Materials</strong>
+                        <small>Keep learning resources organized</small>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <span class="feature-icon" aria-hidden="true">◈</span>
+                    <div>
+                        <strong>Priority Planning</strong>
+                        <small>Focus on important assessments</small>
+                    </div>
+                </div>
+
+                <div class="feature">
+                    <span class="feature-icon" aria-hidden="true">◎</span>
+                    <div>
+                        <strong>AI Study Support</strong>
+                        <small>Designed for personalized learning</small>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ANIMATED COMPUTER AND TIMETABLE -->
+
+            <div class="ai-computer">
+
+                <div class="computer-topbar">
+                    <div class="computer-lights" aria-hidden="true">
+                        <i></i>
+                        <i></i>
+                        <i></i>
+                    </div>
+
+                    <span>AI STUDY PLANNER / SYSTEM PREVIEW</span>
+                    <span class="computer-live">● DEMO</span>
+                </div>
+
+                <div class="computer-screen">
+
+                    <div class="computer-sidebar">
+                        <span>▦ Dashboard</span>
+                        <span>▤ Timetable</span>
+                        <span>◇ Modules</span>
+                        <span>▧ Materials</span>
+                        <span>◎ Progress</span>
+                    </div>
+
+                    <div class="computer-workspace">
+
+                        <h3>Intelligent Study Schedule</h3>
+
+                        <p class="computer-caption">
+                            Example of an organized study day
+                        </p>
+
+                        <div class="schedule-preview">
+
+                            <div class="schedule-row">
+                                <span>08:00</span>
+                                <div class="schedule-block maths">
+                                    Mathematics · Calculus
+                                </div>
+                            </div>
+
+                            <div class="schedule-row">
+                                <span>10:00</span>
+                                <div class="schedule-block ai">
+                                    Artificial Intelligence
+                                </div>
+                            </div>
+
+                            <div class="schedule-row">
+                                <span>12:00</span>
+                                <div class="schedule-block cs">
+                                    Computer Science
+                                </div>
+                            </div>
+
+                            <div class="schedule-row">
+                                <span>14:00</span>
+                                <div class="schedule-block">
+                                    Review &amp; Practice
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="computer-footer">
+                            <span>Schedule preview</span>
+                            <strong>Preparing study view...</strong>
+                        </div>
+
+                        <div class="ai-progress" aria-label="Decorative animation">
+                            <span></span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="system-status">
+                <span class="status-dot"></span>
+                <span>YOUR PERSONALIZED STUDY SPACE</span>
+            </div>
+
+        </section>
+
+        <!-- RIGHT: LOGIN FORM -->
+
+        <section class="login-container">
+
+            <div class="card-heading">
+
+                <div class="brain-icon" aria-hidden="true">🧠</div>
+
+                <h2><span>AI</span> Study Planner</h2>
+
+                <p>
+                    Welcome back.<br>
+                    Continue your personalized study journey.
+                </p>
+
+            </div>
+
+            {% if error %}
+            <div class="error" role="alert">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST">
+
+                <label for="email">Email address</label>
+
+                <div class="input-wrap">
+                    <span class="input-icon" aria-hidden="true">✉</span>
+
+                    <input
+                        id="email"
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <label for="password">Password</label>
+
+                <div class="input-wrap">
+                    <span class="input-icon" aria-hidden="true">🔒</span>
+
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <button class="login-button" type="submit">
+                    Sign in to your workspace &rarr;
+                </button>
+
+            </form>
+
+            <div class="register">
+                Don't have an account?<br>
+
+                <a href="{{ url_for('register') }}">
+                    Create your account &rarr;
+                </a>
+            </div>
+
+            <div class="security-note">
+                AI STUDY PLANNER &bull; YOUR LEARNING JOURNEY STARTS HERE
+            </div>
+
+        </section>
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+study_planner.db
+uploads/*/*
+!uploads/*/.gitkeep
+.venv/
+venv/
+.env
+.vscode/
